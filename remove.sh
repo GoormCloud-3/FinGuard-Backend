@@ -11,6 +11,13 @@ export SG_DAO=$(
 		--output text
 )
 
+export HTTP_API_ID=$(
+  aws apigatewayv2 get-apis \
+    --region ap-northeast-2 \
+    --query "Items[?Name=='dev-FinGuard-Backend'].ApiId" \
+    --output text
+)
+
 export SG_ALERT=$(
 	aws ec2 describe-security-groups \
 		--filters Name=group-name,Values="finguard-${ENV}-alert-lambda" Name=tag:Env,Values="${ENV}" \
@@ -66,9 +73,10 @@ echo "✔ PRIVATE_SUBNET_2:    $PRIVATE_SUBNET_2"
 echo "✔ API_LAMBDA_ROLE_ARN: $API_LAMBDA_ROLE_ARN"
 echo "✔ SQS_LAMBDA_ROLE_ARN: $SQS_LAMBDA_ROLE_ARN"
 echo "✔ SQS_ARN:             $SQS_ARN"
+echo "✔ HTTP_API_ID:         $HTTP_API_ID"
 
 # 🚫 유효성 검사
-if [[ -z "$SG_DAO" || -z "$SG_ALERT" || -z "$PRIVATE_SUBNET_1" || -z "$PRIVATE_SUBNET_2" || -z "$API_LAMBDA_ROLE_ARN" || -z "$SQS_LAMBDA_ROLE_ARN" || -z "$SQS_ARN" ]]; then
+if [[ -z "$SG_DAO" || -z "$HTTP_API_ID" || -z "$SG_ALERT" || -z "$PRIVATE_SUBNET_1" || -z "$PRIVATE_SUBNET_2" || -z "$API_LAMBDA_ROLE_ARN" || -z "$SQS_LAMBDA_ROLE_ARN" || -z "$SQS_ARN" ]]; then
 	echo "❌ 에러: 필수 환경 변수 중 하나 이상이 비어 있습니다." >&2
 	exit 1
 fi
